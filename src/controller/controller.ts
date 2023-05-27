@@ -13,7 +13,7 @@ export function getContentImage(id:string){
     
 }
 
-var pageNo = 1;
+//var pageNo = 1;
 
 export function getDataFromPage(pageNo:number){
     switch (pageNo) {

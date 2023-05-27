@@ -6,7 +6,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import type {PropsWithChildren} from 'react';
+
 import {
   ActivityIndicator,
   Dimensions,
@@ -15,8 +15,6 @@ import {
   ListRenderItem,
   Pressable,
   SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TextInput,
@@ -26,16 +24,10 @@ import {
 
 import {
   Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-import { CONTENT_PART_1, getContentImage, getDataFromPage, image_assets } from './controller/controller';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+} from 'react-native/Libraries/NewAppScreen';
+import { getContentImage, getDataFromPage, image_assets } from './controller/controller';
+
 
 interface content{
   name:string;
@@ -43,20 +35,10 @@ interface content{
 }
 
 
-function getData() {
-  console.log(CONTENT_PART_1.page['content-items']['content'] )
-  return CONTENT_PART_1.page['content-items']['content'] 
-}
-
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
-  const backgroundStyle = {
-   // backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-   backgroundColor:Colors.darker,
-   flex:1,
-  };
 
  const [data, setData] = useState<content[]>([])
  const [page, setPage] = useState(1);
@@ -67,7 +49,6 @@ function App(): JSX.Element {
  const [searchQuery, setSearchQuery] = useState('');
 
  useEffect(() => {
-  // Fetch data from the first JSON file
   filterData();
 }, [searchQuery, data]);
 
@@ -83,6 +64,11 @@ const getMoreData= (pageNo:number) => {
   }
   
 }
+
+/**
+ *Action for Load more content
+ *
+ */
 const handleLoadMore = () => {
   if (!stopLoading) {
     setIsLoading(true);
@@ -90,10 +76,12 @@ const handleLoadMore = () => {
   getMoreData(page+1)
   setIsLoading(false);
   }
-  
 };
 
-
+/**
+ *Filter logic
+ *
+ */
 const filterData = () => {
   const filtered = data.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -103,25 +91,25 @@ const filterData = () => {
 
 
   return (
-    <SafeAreaView style={backgroundStyle}>
+    <SafeAreaView style={styles.backgroundStyle}>
       
-            <View style={{width:"100%",flexDirection:"row",alignItems:"center",justifyContent:"space-between",paddingHorizontal:10}}>
-              {showSearch?
+            <View style={styles.searchComponentView}>
+              {showSearch ?
                 <TextInput
                 
-                style={{borderColor: 'gray', borderWidth: 1,width:Dimensions.get("screen").width-80}}
+                style={styles.searchTextView}
                 onChangeText={(text) => setSearchQuery(text)}
                 value={searchQuery}
                 placeholder="Search"
               />
-              :null}
+              : null}
               
               <Pressable
-              onPress={()=>{showSearch?setShowSearch(false):setShowSearch(true)}}>
-              <Image
-                source={image_assets.search}
-                style={{maxWidth:30,maxHeight:30,justifyContent:"center"}}
-                />
+                onPress={()=>{showSearch ? setShowSearch(false) : setShowSearch(true)}}>
+                <Image
+                  source={image_assets.search}
+                  style={styles.searchImage}
+                  />
               </Pressable>
               
               </View>
@@ -144,16 +132,16 @@ const filterData = () => {
 const recyclerView:ListRenderItem<content>  = ({item,index})=>{
   const screenWidth = Dimensions.get('window').width;
   const screenHeight = Dimensions.get('window').height;
-    const numColumns = 3;
-    const itemWidth = screenWidth / numColumns;
-    const itemHeight = screenHeight / 4;
+  const numColumns = 3; //no.of items in a row
+  const itemWidth = screenWidth / numColumns;
+  const itemHeight = screenHeight / 4;
   return(
   
   <View style={[{maxWidth:itemWidth-10,maxHeight:itemHeight},styles.card]}>
     <View style={{alignContent:"flex-start"}}>
           <Image 
             resizeMode='stretch' 
-            style={{width:itemWidth-10,height:itemHeight-10,borderRadius: 5,}} 
+            style={{width:itemWidth-10,height:itemHeight-10,borderRadius: 5}} 
             source={getContentImage(item['poster-image'])} defaultSource={image_assets.default}
             onError={()=>{
               console.log('image error');
@@ -168,21 +156,42 @@ const recyclerView:ListRenderItem<content>  = ({item,index})=>{
           </View>
                   
   </View>
-)}
+  )
+}
 
 const styles = StyleSheet.create({
-
+  backgroundStyle :{
+    // backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    backgroundColor:Colors.darker,
+    flex:1,
+   },
   card: {
-    //maxWidth:(Dimensions.get("window").width)/3,
     margin: 10,
     marginVertical:30,
     borderRadius: 5,
-    //alignContent:"space-around",
     marginRight: 0,
     marginBottom:0,
     alignItems:"flex-start"
-    //backgroundColor: '#1A1A1A',
   },
+  cardImage:{
+    
+  },
+  searchComponentView:{
+    width:"100%",
+    flexDirection:"row",
+    alignItems:"center",
+    justifyContent:"space-between",
+    paddingHorizontal:10
+  },
+  searchTextView:{
+    borderColor: 'gray',
+    borderWidth: 1,
+    width:Dimensions.get("screen").width-80
+  },
+  searchImage:{
+    maxWidth:30,maxHeight:30,justifyContent:"center"
+  }
+
 
 });
 
